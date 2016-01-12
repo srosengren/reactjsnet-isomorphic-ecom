@@ -1,0 +1,41 @@
+﻿@model reactjsnet_isomorphic_ecom.Controllers.VM
+
+@Html.React("Cart", new
+{
+	products = Model.Cart.Products
+})
+
+@foreach (var p in Model.ProductsList)
+{
+	<h4>@p.title</h4>
+	<p>Price: @p.price</p>
+	@Html.React("BuyButton", new
+{
+	item = p,
+	alreadyInCartAmount = Model.Cart.Products.Where(cp => cp.itemId == p.itemId).Select(cp => cp.amount).FirstOrDefault()
+})
+}
+
+
+
+@section scripts {
+
+	<script src="https://fb.me/react-0.14.0.min.js"></script>
+	<script src="https://fb.me/react-dom-0.14.0.min.js"></script>
+	<script src="~/react/Flux.js"></script>
+	<script src="~/react/appDispatcher.js"></script>
+	<script src="~/react/actionCreators.js"></script>
+	<script src="~/react/cartStore.js"></script>
+	<script src="~/react/storeListener.js"></script>
+	<script src="~/react/Cart.jsx"></script>
+	<script src="~/react/BuyButton.jsx"></script>
+	<script src="~/react/CartList.jsx"></script>
+	<script src="~/react/CartTotal.jsx"></script>
+	@Html.ReactInitJavaScript() @*Attach eventhandlers to server rendered*@
+
+	@* Add data for stores *@
+	<script>
+		var cartStoreInitialItems = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Cart.Products));
+		actionCreators.setInitialItems(cartStoreInitialItems);
+	</script>
+}
